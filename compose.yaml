@@ -36,6 +36,28 @@ services:
       - projeto-korp-network
     restart: unless-stopped
 
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-projeto-korp
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - projeto-korp-network
+    restart: unless-stopped
+
 networks:
   projeto-korp-network:
     external: true
+
+volumes:
+  grafana-data:
