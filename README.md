@@ -2,46 +2,70 @@
 
 Projeto desenvolvido como desafio técnico utilizando **Go, Docker, Docker Compose, Nginx, Prometheus, Grafana, Ansible, Git e GitHub**.
 
-O objetivo deste projeto é criar um servidor HTTP em Go e evoluí-lo para uma arquitetura containerizada, monitorada e automatizada.
+O objetivo é demonstrar a construção de uma aplicação HTTP simples e sua evolução para uma arquitetura containerizada, monitorada, automatizada e reproduzível.
 
-Além de executar a aplicação, o projeto demonstra conceitos importantes utilizados em ambientes reais de desenvolvimento e DevOps, como:
+O projeto reúne conceitos de:
 
-- desenvolvimento de uma aplicação HTTP;
-- compilação de uma aplicação Go;
-- criação de imagens Docker;
-- uso de containers;
-- Docker Compose;
-- proxy reverso com Nginx;
+- desenvolvimento backend;
+- API/servidor HTTP;
+- containerização;
+- Docker multi-stage build;
+- proxy reverso;
 - redes Docker;
-- exposição de métricas;
-- monitoramento com Prometheus;
-- dashboards com Grafana;
+- orquestração de containers;
+- métricas;
+- observabilidade;
+- monitoramento;
+- dashboards;
 - provisionamento automático;
-- automação de deploy com Ansible;
-- versionamento com Git;
-- publicação do projeto no GitHub.
+- automação de deploy;
+- infraestrutura como código;
+- Git e GitHub.
 
 ---
 
-## 1. Visão Geral do Projeto
+## Sumário
 
-A aplicação principal foi desenvolvida utilizando a linguagem **Go**.
+1. [Visão Geral do Projeto](#1-visão-geral-do-projeto)
+2. [Roteiro de Avaliação Técnica para Recrutadores](#2-roteiro-de-avaliação-técnica-para-recrutadores)
+3. [Tecnologias Utilizadas](#3-tecnologias-utilizadas)
+4. [Aplicação Go](#4-aplicação-go)
+5. [Docker e Docker Compose](#5-docker-e-docker-compose)
+6. [Nginx](#6-nginx)
+7. [Prometheus](#7-prometheus)
+8. [Grafana e Provisionamento](#8-grafana-e-provisionamento)
+9. [Ansible](#9-ansible)
+10. [Arquitetura de Pastas](#10-arquitetura-de-pastas)
+11. [Rede Docker](#11-rede-docker)
+12. [Fluxo Completo da Aplicação](#12-fluxo-completo-da-aplicação)
+13. [Execução Manual](#13-execução-manual)
+14. [Testes e Diagnóstico](#14-testes-e-diagnóstico)
+15. [Git e GitHub](#15-git-e-github)
+16. [Conclusão](#16-conclusão)
 
-Ela executa um servidor HTTP que responde às requisições realizadas pelos usuários.
+---
 
-Porém, o projeto não executa apenas o programa Go.
+# 1. Visão Geral do Projeto
 
-Foram adicionados outros componentes para criar uma infraestrutura mais completa.
+A aplicação principal foi desenvolvida utilizando **Go (Golang)**.
 
-A arquitetura utilizada pode ser representada da seguinte forma:
+Ela disponibiliza um servidor HTTP que recebe requisições e retorna uma resposta em JSON.
+
+Porém, o projeto não consiste apenas na aplicação Go.
+
+Ao redor da aplicação foi construída uma pequena infraestrutura utilizando tecnologias comuns em ambientes DevOps.
+
+A arquitetura principal é:
 
 ```text
                          USUÁRIO
                             |
+                            | HTTP
                             v
                      +-------------+
                      |    NGINX    |
                      |   Porta 80   |
+                     |Reverse Proxy|
                      +-------------+
                             |
                             v
@@ -70,171 +94,215 @@ Além desses componentes:
 ```text
 Docker
    |
-   +-- executa os containers
+   +-- executa os serviços em containers
 
 Docker Compose
    |
-   +-- organiza os serviços e suas conexões
+   +-- organiza e conecta os containers
 
 Ansible
    |
-   +-- automatiza o deploy
+   +-- automatiza o processo de deploy
 
 Git
    |
-   +-- controla as versões
+   +-- registra o histórico do projeto
 
 GitHub
    |
-   +-- armazena o projeto remotamente
+   +-- mantém o repositório remoto
 ```
 
-Para facilitar o entendimento de quem está começando:
+### Explicação simples
+
+Para alguém que não conhece essas tecnologias, podemos imaginar uma empresa:
 
 | Tecnologia | Comparação simples |
 |---|---|
-| Go | Funcionário que executa o trabalho |
-| Nginx | Recepção da empresa |
-| Prometheus | Funcionário que coleta indicadores |
-| Grafana | Painel que apresenta os indicadores |
-| Docker | Caixa isolada onde cada serviço funciona |
-| Docker Compose | Coordenador das caixas |
-| Ansible | Automação que prepara e executa o ambiente |
-| Git | Histórico de alterações |
-| GitHub | Local onde o projeto fica armazenado na internet |
+| **Go** | Funcionário que realiza o trabalho |
+| **Nginx** | Recepção que recebe o usuário |
+| **Prometheus** | Funcionário que coleta indicadores |
+| **Grafana** | Painel onde os indicadores são apresentados |
+| **Docker** | Caixa isolada onde cada serviço funciona |
+| **Docker Compose** | Coordenador das caixas |
+| **Ansible** | Automação que executa tarefas de infraestrutura |
+| **Git** | Histórico de todas as alterações |
+| **GitHub** | Local remoto onde o projeto fica armazenado |
 
 ---
 
-## 2. Tecnologias Utilizadas
+# 2. Roteiro de Avaliação Técnica para Recrutadores
 
-### 2.1 Go
+Esta seção permite que um avaliador que esteja acessando o projeto pela primeira vez consiga executar e validar a solução.
 
-**Go**, também conhecido como **Golang**, é a linguagem utilizada para desenvolver a aplicação principal.
+O roteiro considera preferencialmente um ambiente **Linux** com Docker, Docker Compose, Git e Ansible disponíveis.
 
-O código principal encontra-se em:
+---
 
-```text
-main.go
+## 2.1 Clonar o projeto
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/passostestes/http-server-projeto-korp.git
 ```
 
-De forma simples:
+Entre na pasta:
 
-> Go contém a lógica principal da aplicação.
+```bash
+cd http-server-projeto-korp
+```
 
-A aplicação Go é responsável por:
+Confirme:
 
-- iniciar o servidor HTTP;
-- receber requisições;
-- processar as requisições;
-- devolver respostas;
-- disponibilizar a rota da aplicação;
-- disponibilizar métricas para monitoramento.
+```bash
+pwd
+```
 
-A porta interna utilizada pela aplicação é:
+Liste os arquivos:
+
+```bash
+ls -la
+```
+
+A estrutura principal deverá ser semelhante a:
 
 ```text
-8080
+http-server-projeto-korp/
+├── ansible/
+├── grafana/
+├── nginx/
+├── prometheus/
+├── .gitignore
+├── Dockerfile
+├── compose.yaml
+├── go.mod
+├── go.sum
+├── main.go
+└── README.md
 ```
 
 ---
 
-### 2.2 Docker
+## 2.2 Verificar os pré-requisitos
 
-**Docker** é uma tecnologia utilizada para executar aplicações dentro de ambientes isolados chamados **containers**.
+### Git
 
-Um container pode ser entendido como uma pequena caixa contendo determinado serviço e tudo aquilo que ele precisa para funcionar.
-
-Neste projeto existem containers para:
-
-```text
-Aplicação Go
-Nginx
-Prometheus
-Grafana
+```bash
+git --version
 ```
 
-Isso facilita a reprodução do ambiente.
-
-Em vez de configurar cada aplicação manualmente em diferentes computadores, o Docker permite criar ambientes padronizados.
-
-Para verificar a versão instalada:
+### Docker
 
 ```bash
 docker --version
 ```
 
-Para visualizar containers em execução:
+### Docker Compose
+
+```bash
+docker-compose --version
+```
+
+### Ansible
+
+```bash
+ansible --version
+```
+
+### Go
+
+Opcionalmente:
+
+```bash
+go version
+```
+
+> O Go instalado diretamente no host não é obrigatório para executar a aplicação via Docker, pois a compilação é realizada durante a construção da imagem.
+
+---
+
+## 2.3 Criar a rede Docker
+
+O projeto utiliza uma rede externa chamada:
+
+```text
+projeto-korp-network
+```
+
+Primeiro verifique:
+
+```bash
+docker network ls
+```
+
+Caso a rede não exista:
+
+```bash
+docker network create --driver bridge projeto-korp-network
+```
+
+Confirme novamente:
+
+```bash
+docker network ls
+```
+
+Deve aparecer:
+
+```text
+projeto-korp-network
+```
+
+> Se o Docker informar que a rede já existe, basta continuar.
+
+---
+
+## 2.4 Validar o Docker Compose
+
+Antes de iniciar os serviços:
+
+```bash
+docker-compose config
+```
+
+Para uma verificação mais simples:
+
+```bash
+docker-compose config >/dev/null && echo "COMPOSE OK"
+```
+
+Resultado esperado:
+
+```text
+COMPOSE OK
+```
+
+Isso confirma que o arquivo `compose.yaml` possui sintaxe válida.
+
+---
+
+## 2.5 Construir e iniciar o ambiente
+
+Execute:
+
+```bash
+docker-compose up -d --build
+```
+
+Aguarde alguns segundos:
+
+```bash
+sleep 10
+```
+
+Verifique:
 
 ```bash
 docker ps
 ```
 
-Para visualizar também containers parados:
-
-```bash
-docker ps -a
-```
-
----
-
-### 2.3 Dockerfile
-
-O arquivo:
-
-```text
-Dockerfile
-```
-
-contém as instruções necessárias para o Docker construir a imagem da aplicação Go.
-
-O projeto utiliza uma estratégia conhecida como **multi-stage build**.
-
-De maneira simplificada:
-
-```text
-ETAPA 1
-
-Imagem com ferramentas de desenvolvimento Go
-                |
-                v
-Código-fonte é compilado
-                |
-                v
-Executável é criado
-
-
-ETAPA 2
-
-Imagem menor
-     |
-     v
-Recebe somente o executável
-     |
-     v
-Executa a aplicação
-```
-
-A principal vantagem é evitar que ferramentas utilizadas apenas durante a compilação fiquem desnecessariamente dentro da imagem final.
-
-Isso ajuda a criar uma imagem menor e mais apropriada para execução.
-
----
-
-### 2.4 Docker Compose
-
-O arquivo:
-
-```text
-compose.yaml
-```
-
-centraliza a configuração dos serviços Docker.
-
-O Docker permite executar containers.
-
-O **Docker Compose** facilita a execução de vários containers que fazem parte da mesma aplicação.
-
-Neste projeto o Compose administra:
+Os quatro serviços esperados são:
 
 ```text
 http-server-projeto-korp
@@ -243,174 +311,152 @@ prometheus-projeto-korp
 grafana-projeto-korp
 ```
 
-O comando utilizado para iniciar a infraestrutura é:
-
-```bash
-docker-compose up -d --build
-```
-
-Onde:
+Todos devem apresentar status semelhante a:
 
 ```text
-up
-```
-
-inicia os serviços.
-
-```text
--d
-```
-
-executa os containers em segundo plano.
-
-```text
---build
-```
-
-solicita a reconstrução da imagem quando necessário.
-
-Para verificar se o arquivo Compose possui configuração válida:
-
-```bash
-docker-compose config
-```
-
-Também foi utilizado:
-
-```bash
-docker-compose config >/dev/null && echo "COMPOSE OK"
-```
-
-Quando a configuração está correta, o resultado esperado é:
-
-```text
-COMPOSE OK
+Up
 ```
 
 ---
 
-## 3. Nginx
+## 2.6 Verificar as portas
 
-O **Nginx** funciona como **proxy reverso**.
+Execute:
 
-Para entender de forma simples, podemos imaginar uma empresa.
-
-Quando uma pessoa chega à empresa, normalmente ela fala primeiro com a recepção.
-
-A recepção identifica para onde aquela pessoa precisa ir.
-
-Neste projeto:
-
-```text
-Usuário
-   |
-   v
-Nginx
-   |
-   v
-Aplicação Go
+```bash
+docker ps
 ```
 
-O Nginx funciona como essa recepção.
+O comportamento esperado é:
 
-O usuário acessa:
+| Serviço | Porta | Exposição |
+|---|---:|---|
+| Nginx | 80 | Host |
+| Go | 8080 | Somente rede Docker |
+| Prometheus | 9090 | Host |
+| Grafana | 3000 | Host |
 
-```text
-http://localhost/projeto-korp
-```
+A aplicação Go utiliza a porta `8080`, mas ela não precisa ser publicada diretamente no host.
 
-O Nginx recebe a requisição e encaminha internamente para a aplicação Go.
+O acesso externo ocorre através do Nginx.
 
-A porta externa utilizada pelo Nginx é:
-
-```text
-80
-```
-
-O container utilizado é baseado em:
+Isso significa que não é esperado encontrar:
 
 ```text
-nginx:alpine
+0.0.0.0:8080->8080/tcp
 ```
 
-A configuração encontra-se no diretório:
+para a aplicação Go.
 
-```text
-nginx/
-```
+---
 
-A utilização de proxy reverso evita a necessidade de expor diretamente a aplicação Go para o usuário.
+## 2.7 Testar a aplicação
 
-### Teste do Nginx
-
-O comando utilizado foi:
+Execute:
 
 ```bash
 curl -i http://localhost/projeto-korp
 ```
 
-O resultado esperado inclui:
+Resultado esperado:
 
 ```text
 HTTP/1.1 200 OK
 ```
 
-e a resposta da aplicação.
+Além do status HTTP, será retornado um JSON semelhante a:
+
+```json
+{
+  "nome": "Projeto Korp",
+  "horario": "2026-08-16T14:32:51Z"
+}
+```
+
+O horário é gerado dinamicamente pela aplicação.
+
+Execute novamente:
+
+```bash
+curl http://localhost/projeto-korp
+```
+
+Uma nova requisição deve retornar um novo horário.
 
 ---
 
-## 4. Prometheus
+## 2.8 Confirmar o funcionamento do proxy reverso
 
-O **Prometheus** é responsável pela coleta e armazenamento de métricas.
+O fluxo testado anteriormente é:
 
-Uma métrica é um número utilizado para acompanhar o comportamento de uma aplicação.
+```text
+curl
+  |
+  v
+localhost:80
+  |
+  v
+Nginx
+  |
+  v
+Go:8080
+```
+
+O retorno `HTTP 200` através da porta 80 confirma que o Nginx consegue encaminhar a requisição para a aplicação Go.
+
+---
+
+## 2.9 Confirmar que a porta 8080 não está publicada
+
+Execute:
+
+```bash
+curl --max-time 3 http://localhost:8080/projeto-korp
+```
+
+Como a porta não está publicada no host, é esperado que a conexão direta falhe.
 
 Por exemplo:
 
-- quantidade de requisições;
-- duração das requisições;
-- disponibilidade do serviço;
-- comportamento da aplicação ao longo do tempo.
-
-A aplicação disponibiliza métricas e o Prometheus consulta essas informações.
-
-O fluxo é:
-
 ```text
-Aplicação Go
-      |
-      | /metrics
-      v
-Prometheus
+curl: (7) Failed to connect to localhost port 8080
 ```
 
-O container utilizado é baseado em:
+Isso não representa falha da aplicação.
+
+É consequência da arquitetura adotada:
 
 ```text
-prom/prometheus:latest
+Usuário -> Nginx -> Go
 ```
 
-O Prometheus utiliza a porta:
+em vez de:
 
 ```text
-9090
+Usuário -> Go diretamente
 ```
 
-A configuração encontra-se em:
+---
 
-```text
-prometheus/
+## 2.10 Gerar tráfego para as métricas
+
+Para gerar várias requisições:
+
+```bash
+for i in $(seq 1 30); do
+  curl -s http://localhost/projeto-korp > /dev/null
+done
 ```
 
-O arquivo principal de configuração é:
+Isso realiza 30 requisições contra a aplicação.
 
-```text
-prometheus/prometheus.yml
-```
+Essas requisições ajudam a gerar dados para o Prometheus e Grafana.
 
-### Teste do Prometheus
+---
 
-Foi utilizado:
+## 2.11 Testar o Prometheus
+
+Verifique se o Prometheus está pronto:
 
 ```bash
 curl -s http://localhost:9090/-/ready
@@ -422,56 +468,37 @@ Resultado esperado:
 Prometheus Server is Ready.
 ```
 
-Isso indica que o servidor Prometheus está funcionando.
+---
+
+## 2.12 Consultar o Prometheus
+
+Uma consulta básica pode ser realizada utilizando:
+
+```bash
+curl -s 'http://localhost:9090/api/v1/query?query=up'
+```
+
+A métrica `up` é utilizada pelo Prometheus para indicar se um target está disponível.
+
+Em termos simples:
+
+```text
+up = 1
+```
+
+significa que o target está sendo coletado corretamente.
+
+```text
+up = 0
+```
+
+indica problema na coleta daquele target.
 
 ---
 
-## 5. Grafana
+## 2.13 Testar o Grafana
 
-O **Grafana** é responsável pela visualização das métricas.
-
-Existe uma diferença importante entre Prometheus e Grafana:
-
-```text
-PROMETHEUS
-     |
-     +-- coleta e armazena métricas
-
-GRAFANA
-     |
-     +-- consulta essas métricas
-     |
-     +-- apresenta as informações visualmente
-```
-
-O fluxo completo é:
-
-```text
-Aplicação Go
-      |
-      v
-Prometheus
-      |
-      v
-Grafana
-      |
-      v
-Dashboard
-```
-
-O container utilizado é baseado em:
-
-```text
-grafana/grafana:latest
-```
-
-O Grafana utiliza a porta:
-
-```text
-3000
-```
-
-O serviço pode ser verificado através de:
+Execute:
 
 ```bash
 curl -I http://localhost:3000/login
@@ -483,46 +510,572 @@ Resultado esperado:
 HTTP/1.1 200 OK
 ```
 
+O Grafana está disponível em:
+
+```text
+http://localhost:3000
+```
+
+No ambiente de demonstração foram configuradas credenciais administrativas para facilitar os testes.
+
+> Em um ambiente real de produção, credenciais não devem permanecer fixas diretamente em arquivos versionados. O recomendado é utilizar secrets ou variáveis protegidas.
+
 ---
 
-## 6. Provisionamento do Grafana
+## 2.14 Verificar o datasource do Grafana
 
-O projeto utiliza o recurso de **provisioning** do Grafana.
+O datasource Prometheus é provisionado automaticamente.
 
-Provisionamento significa deixar configurações preparadas antecipadamente.
+Durante o desenvolvimento foi utilizado:
 
-Sem provisioning seria necessário:
-
-```text
-Iniciar Grafana
-      |
-      v
-Abrir interface
-      |
-      v
-Cadastrar Prometheus
-      |
-      v
-Criar/importar dashboard
+```bash
+curl -s -u admin:admin http://localhost:3000/api/datasources
 ```
 
-Com provisioning:
+O resultado deve conter informações semelhantes a:
 
 ```text
-Grafana inicia
-      |
-      v
-Lê os arquivos de configuração
-      |
-      +-- configura Prometheus
-      |
-      +-- carrega dashboard
-      |
-      v
-Ambiente preparado
+"name":"Prometheus"
 ```
 
-A estrutura utilizada é:
+e:
+
+```text
+"url":"http://prometheus:9090"
+```
+
+Isso confirma que o Grafana consegue localizar o Prometheus pela rede Docker.
+
+---
+
+## 2.15 Verificar o dashboard provisionado
+
+Execute:
+
+```bash
+curl -s -u admin:admin "http://localhost:3000/api/search?query=HTTP"
+```
+
+Deve aparecer um dashboard com título semelhante a:
+
+```text
+HTTP Server Projeto Korp
+```
+
+Isso confirma que o dashboard foi carregado automaticamente.
+
+---
+
+## 2.16 Validar o Ansible
+
+Antes da execução:
+
+```bash
+ansible-playbook \
+  -i ansible/inventory.ini \
+  ansible/playbook.yml \
+  --syntax-check
+```
+
+Resultado esperado:
+
+```text
+playbook: ansible/playbook.yml
+```
+
+---
+
+## 2.17 Executar o Ansible
+
+Execute:
+
+```bash
+ansible-playbook \
+  -i ansible/inventory.ini \
+  ansible/playbook.yml
+```
+
+Ao final deverá aparecer um resumo semelhante a:
+
+```text
+PLAY RECAP
+
+localhost : ok=10 changed=1 unreachable=0 failed=0
+```
+
+O ponto principal é:
+
+```text
+failed=0
+```
+
+Isso indica que nenhuma tarefa do playbook falhou.
+
+---
+
+## 2.18 Verificar novamente os containers
+
+Depois da execução do Ansible:
+
+```bash
+docker ps
+```
+
+Os quatro serviços devem continuar funcionando:
+
+```text
+http-server-projeto-korp
+nginx-projeto-korp
+prometheus-projeto-korp
+grafana-projeto-korp
+```
+
+---
+
+## 2.19 Teste consolidado
+
+Para uma verificação rápida:
+
+```bash
+echo "=== APLICACAO VIA NGINX ==="
+curl -i http://localhost/projeto-korp
+
+echo
+echo "=== PROMETHEUS ==="
+curl -s http://localhost:9090/-/ready
+
+echo
+echo "=== GRAFANA ==="
+curl -I http://localhost:3000/login
+
+echo
+echo "=== CONTAINERS ==="
+docker ps
+```
+
+Resultado esperado:
+
+```text
+Aplicação  -> HTTP 200
+Prometheus -> Ready
+Grafana    -> HTTP 200
+Containers -> todos Up
+```
+
+---
+
+## 2.20 Encerrar o ambiente
+
+Depois dos testes:
+
+```bash
+docker-compose down
+```
+
+Verifique:
+
+```bash
+docker ps
+```
+
+Como `projeto-korp-network` é uma rede externa, ela não é necessariamente removida pelo Compose.
+
+Caso seja necessário removê-la:
+
+```bash
+docker network rm projeto-korp-network
+```
+
+---
+
+## 2.21 Resultado esperado da avaliação
+
+Ao final deste roteiro, o avaliador deverá conseguir verificar:
+
+- aplicação Go funcionando;
+- endpoint HTTP respondendo;
+- resposta JSON;
+- horário gerado dinamicamente;
+- Nginx funcionando como proxy reverso;
+- porta 8080 não publicada diretamente;
+- containers funcionando;
+- rede Docker funcionando;
+- Prometheus disponível;
+- Prometheus coletando o target;
+- Grafana disponível;
+- datasource Prometheus provisionado;
+- dashboard Grafana provisionado;
+- Docker Compose válido;
+- Ansible com sintaxe válida;
+- playbook Ansible executado sem falhas.
+
+---
+
+# 3. Tecnologias Utilizadas
+
+## 3.1 Go
+
+**Go**, ou Golang, é a linguagem utilizada para desenvolver o servidor HTTP.
+
+De maneira simples:
+
+> Go é o componente que executa a lógica principal da aplicação.
+
+O código encontra-se principalmente em:
+
+```text
+main.go
+```
+
+Responsabilidades:
+
+- iniciar o servidor;
+- receber requisições;
+- processar requisições;
+- gerar respostas;
+- expor a aplicação;
+- fornecer métricas.
+
+---
+
+## 3.2 Docker
+
+Docker permite executar aplicações em ambientes isolados chamados **containers**.
+
+Neste projeto existem containers independentes para:
+
+- Go;
+- Nginx;
+- Prometheus;
+- Grafana.
+
+A vantagem é permitir que cada serviço possua seu próprio ambiente.
+
+---
+
+## 3.3 Dockerfile
+
+O:
+
+```text
+Dockerfile
+```
+
+define como a imagem da aplicação Go é construída.
+
+Foi utilizado **multi-stage build**.
+
+```text
+Primeira etapa
+      |
+      v
+Compilação da aplicação
+      |
+      v
+Binário Go
+      |
+      v
+Segunda etapa
+      |
+      v
+Imagem final de execução
+```
+
+Essa técnica permite separar o ambiente utilizado para compilar daquele utilizado para executar.
+
+---
+
+## 3.4 Docker Compose
+
+O:
+
+```text
+compose.yaml
+```
+
+define os serviços que compõem a solução.
+
+Ele centraliza configurações relacionadas a:
+
+- imagens;
+- containers;
+- portas;
+- volumes;
+- redes;
+- dependências;
+- reinicialização.
+
+---
+
+## 3.5 Nginx
+
+Nginx funciona como proxy reverso.
+
+É a porta de entrada da aplicação.
+
+---
+
+## 3.6 Prometheus
+
+Prometheus realiza coleta e armazenamento de métricas.
+
+---
+
+## 3.7 Grafana
+
+Grafana consulta as métricas e apresenta dashboards.
+
+---
+
+## 3.8 Ansible
+
+Ansible automatiza tarefas relacionadas ao deploy e verificação da infraestrutura.
+
+---
+
+## 3.9 Git
+
+Git registra o histórico de desenvolvimento.
+
+---
+
+## 3.10 GitHub
+
+GitHub mantém uma cópia remota e versionada do projeto.
+
+---
+
+# 4. Aplicação Go
+
+A aplicação principal está localizada em:
+
+```text
+main.go
+```
+
+Ela disponibiliza o endpoint:
+
+```text
+/projeto-korp
+```
+
+A aplicação retorna informações em JSON.
+
+Exemplo:
+
+```json
+{
+  "nome": "Projeto Korp",
+  "horario": "2026-08-16T14:32:51Z"
+}
+```
+
+A porta utilizada internamente é:
+
+```text
+8080
+```
+
+Por decisão de arquitetura, essa porta não é publicada diretamente para o host.
+
+O acesso externo ocorre através do Nginx.
+
+```text
+Usuário
+   |
+   v
+Nginx :80
+   |
+   v
+Go :8080
+```
+
+Isso mantém a aplicação atrás do proxy reverso.
+
+---
+
+# 5. Docker e Docker Compose
+
+## 5.1 Dockerfile
+
+O Dockerfile é responsável por transformar a aplicação em uma imagem Docker.
+
+A estratégia multi-stage permite:
+
+```text
+Código Go
+   |
+   v
+Compilação
+   |
+   v
+Binário
+   |
+   v
+Imagem final
+```
+
+---
+
+## 5.2 Docker Compose
+
+O arquivo:
+
+```text
+compose.yaml
+```
+
+coordena os serviços.
+
+Os principais containers são:
+
+```text
+http-server-projeto-korp
+nginx-projeto-korp
+prometheus-projeto-korp
+grafana-projeto-korp
+```
+
+### Validar
+
+```bash
+docker-compose config
+```
+
+### Construir e iniciar
+
+```bash
+docker-compose up -d --build
+```
+
+### Verificar
+
+```bash
+docker ps
+```
+
+### Parar
+
+```bash
+docker-compose down
+```
+
+---
+
+# 6. Nginx
+
+O Nginx funciona como **reverse proxy**.
+
+Para uma explicação simples:
+
+```text
+Cliente chega
+    |
+    v
+Recepção (Nginx)
+    |
+    v
+Aplicação correta (Go)
+```
+
+A configuração encontra-se dentro de:
+
+```text
+nginx/
+```
+
+O Nginx recebe requisições pela porta:
+
+```text
+80
+```
+
+e encaminha para o servidor Go pela rede Docker.
+
+Teste:
+
+```bash
+curl -i http://localhost/projeto-korp
+```
+
+Resultado esperado:
+
+```text
+HTTP/1.1 200 OK
+```
+
+---
+
+# 7. Prometheus
+
+Prometheus é utilizado para monitoramento.
+
+A aplicação disponibiliza métricas e o Prometheus realiza coletas periódicas.
+
+```text
+Aplicação
+   |
+   | métricas
+   v
+Prometheus
+```
+
+Sua configuração encontra-se em:
+
+```text
+prometheus/prometheus.yml
+```
+
+A porta publicada é:
+
+```text
+9090
+```
+
+Teste:
+
+```bash
+curl -s http://localhost:9090/-/ready
+```
+
+Resultado:
+
+```text
+Prometheus Server is Ready.
+```
+
+Uma consulta pela API pode ser realizada com:
+
+```bash
+curl -s 'http://localhost:9090/api/v1/query?query=up'
+```
+
+---
+
+# 8. Grafana e Provisionamento
+
+Grafana é responsável pela visualização das métricas coletadas pelo Prometheus.
+
+```text
+Go
+ |
+ v
+Prometheus
+ |
+ v
+Grafana
+ |
+ v
+Dashboard
+```
+
+A porta utilizada é:
+
+```text
+3000
+```
+
+## 8.1 Estrutura
 
 ```text
 grafana/
@@ -537,121 +1090,65 @@ grafana/
         └── datasource.yml
 ```
 
-### Datasource
+## 8.2 Datasource
 
-O arquivo:
+O datasource Prometheus é configurado automaticamente.
 
-```text
-grafana/provisioning/datasources/datasource.yml
-```
-
-configura o Prometheus automaticamente como fonte de dados.
-
-O Grafana acessa o Prometheus internamente através da rede Docker.
-
-### Dashboard
-
-O arquivo:
-
-```text
-grafana/dashboards/http-server-projeto-korp-dashboard.json
-```
-
-contém a definição do dashboard.
-
-O arquivo:
-
-```text
-grafana/provisioning/dashboards/dashboards.yml
-```
-
-informa ao Grafana onde os dashboards estão armazenados.
-
-### Validação do JSON
-
-Durante a configuração foi utilizado Python para verificar se o arquivo JSON era válido:
-
-```bash
-python3 -m json.tool grafana/dashboards/http-server-projeto-korp-dashboard.json > /dev/null
-```
-
-Depois:
-
-```bash
-echo "JSON OK"
-```
-
-Resultado:
-
-```text
-JSON OK
-```
-
-### Teste do datasource pela API do Grafana
-
-Foi utilizado:
-
-```bash
-curl -s -u admin:admin http://localhost:3000/api/datasources
-```
-
-O resultado confirmou a existência do datasource:
-
-```text
-Prometheus
-```
-
-com URL interna:
+A comunicação interna utiliza:
 
 ```text
 http://prometheus:9090
 ```
 
-### Teste do dashboard pela API
+## 8.3 Dashboard
 
-Também foi realizada uma consulta ao Grafana para verificar o dashboard provisionado:
+O dashboard também é carregado automaticamente através do provisioning.
+
+## 8.4 Validação do JSON
+
+Durante o desenvolvimento foi utilizado:
+
+```bash
+python3 -m json.tool grafana/dashboards/http-server-projeto-korp-dashboard.json > /dev/null && echo "DASHBOARD JSON OK"
+```
+
+Resultado esperado:
+
+```text
+DASHBOARD JSON OK
+```
+
+## 8.5 Teste do Grafana
+
+```bash
+curl -I http://localhost:3000/login
+```
+
+Resultado:
+
+```text
+HTTP/1.1 200 OK
+```
+
+## 8.6 Teste do datasource
+
+```bash
+curl -s -u admin:admin http://localhost:3000/api/datasources
+```
+
+## 8.7 Teste do dashboard
 
 ```bash
 curl -s -u admin:admin "http://localhost:3000/api/search?query=HTTP"
 ```
 
-O dashboard retornado possui o título:
-
-```text
-HTTP Server Projeto Korp
-```
-
-confirmando o provisionamento.
-
 ---
 
-## 7. Ansible
+# 9. Ansible
 
-O **Ansible** foi utilizado para automatizar o processo de deploy.
+Ansible automatiza tarefas de infraestrutura.
 
-Sem Ansible seria necessário executar manualmente diversas etapas.
-
-Por exemplo:
-
-```text
-Verificar Docker
-        |
-        v
-Verificar Docker Compose
-        |
-        v
-Validar configuração
-        |
-        v
-Executar Docker Compose
-        |
-        v
-Verificar containers
-```
-
-O Ansible permite colocar essas etapas dentro de um arquivo chamado **playbook**.
-
-A estrutura utilizada é:
+Os arquivos estão em:
 
 ```text
 ansible/
@@ -659,105 +1156,67 @@ ansible/
 └── playbook.yml
 ```
 
-### Verificação da instalação
+## 9.1 Inventory
 
-Foi utilizado:
-
-```bash
-ansible --version
-```
-
-No ambiente utilizado durante o desenvolvimento foi identificado o Ansible Core instalado e funcionando.
-
----
-
-## 8. Executando o Ansible
-
-### Inventory
-
-O arquivo:
-
-```text
-ansible/inventory.ini
-```
-
-define onde o Ansible executará as tarefas.
-
-Neste projeto foi utilizado:
+O inventário utilizado é baseado em:
 
 ```ini
 [projeto_korp]
 localhost ansible_connection=local
 ```
 
-Isso significa:
+Isso informa ao Ansible que as tarefas devem ser executadas na própria máquina.
 
-> Execute as tarefas na própria máquina.
+## 9.2 Playbook
 
-### Playbook
-
-O arquivo:
+O playbook realiza tarefas como:
 
 ```text
-ansible/playbook.yml
+Verificar Docker
+       |
+       v
+Verificar Docker Compose
+       |
+       v
+Validar Compose
+       |
+       v
+Executar build/deploy
+       |
+       v
+Verificar containers
 ```
 
-contém as tarefas automatizadas.
+## 9.3 Verificar versão
 
-Entre as verificações realizadas estão:
+```bash
+ansible --version
+```
 
-- coleta de informações do ambiente;
-- verificação do Docker;
-- exibição da versão do Docker;
-- verificação do Docker Compose;
-- exibição da versão do Docker Compose;
-- validação do Compose;
-- execução do deploy;
-- verificação dos containers.
-
-### Verificação da sintaxe
-
-Antes de executar o playbook foi utilizado:
+## 9.4 Validar sintaxe
 
 ```bash
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --syntax-check
 ```
 
-Resultado esperado:
-
-```text
-playbook: ansible/playbook.yml
-```
-
-### Execução
-
-O comando utilizado foi:
+## 9.5 Executar
 
 ```bash
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 ```
 
-Ao final da execução bem-sucedida, o Ansible apresentou um resumo semelhante a:
+No teste realizado, o playbook terminou sem falhas:
 
 ```text
-PLAY RECAP
-
-localhost : ok=10 changed=1 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
-```
-
-O ponto mais importante é:
-
-```text
+unreachable=0
 failed=0
 ```
 
-Isso indica que o playbook terminou sem tarefas com falha.
-
 ---
 
-## 9. Arquitetura de Pastas
+# 10. Arquitetura de Pastas
 
-A estrutura principal do projeto é:
+A estrutura principal é:
 
 ```text
 http-server-projeto-korp/
@@ -773,7 +1232,6 @@ http-server-projeto-korp/
 │
 ├── nginx/
 │   └── conf.d/
-│       └── http-server-projeto-korp.conf
 │
 ├── prometheus/
 │   └── prometheus.yml
@@ -794,395 +1252,284 @@ http-server-projeto-korp/
     └── playbook.yml
 ```
 
-### `main.go`
+## `main.go`
 
-É o código-fonte principal da aplicação.
+Código principal da aplicação.
 
-Ele contém o servidor HTTP desenvolvido em Go.
+## `go.mod`
 
----
+Define o módulo Go e suas dependências.
 
-### `go.mod`
+## `go.sum`
 
-Define o módulo Go e registra as dependências diretas do projeto.
+Mantém informações de integridade das dependências.
 
----
+## `Dockerfile`
 
-### `go.sum`
+Define a construção da imagem da aplicação.
 
-Armazena informações de verificação das dependências utilizadas pelo Go.
+## `compose.yaml`
 
----
+Define a infraestrutura Docker.
 
-### `Dockerfile`
+## `.gitignore`
 
-Define como construir a imagem Docker da aplicação.
+Define arquivos que não devem ser versionados.
 
----
+## `nginx/`
 
-### `compose.yaml`
+Configuração do proxy reverso.
 
-É o arquivo central da infraestrutura Docker.
+## `prometheus/`
 
-Define:
+Configuração da coleta de métricas.
 
-- aplicação Go;
-- Nginx;
-- Prometheus;
-- Grafana;
-- portas;
-- volumes;
-- dependências;
-- rede Docker;
-- políticas de reinicialização.
+## `grafana/dashboards/`
 
----
+Dashboard do projeto.
 
-### `.gitignore`
+## `grafana/provisioning/datasources/`
 
-Informa ao Git quais arquivos não devem ser adicionados ao repositório.
+Configuração automática do Prometheus no Grafana.
 
-É útil para evitar arquivos temporários ou desnecessários.
+## `grafana/provisioning/dashboards/`
 
----
+Configuração automática dos dashboards.
 
-### `nginx/`
+## `ansible/inventory.ini`
 
-Contém a configuração do proxy reverso.
+Define os hosts administrados pelo Ansible.
+
+## `ansible/playbook.yml`
+
+Define as tarefas automatizadas.
 
 ---
 
-### `prometheus/`
+# 11. Rede Docker
 
-Contém a configuração do sistema de monitoramento.
+Os containers precisam conseguir conversar.
 
----
-
-### `grafana/`
-
-Contém toda a configuração relacionada à visualização das métricas.
-
----
-
-### `grafana/dashboards/`
-
-Contém o dashboard em formato JSON.
-
----
-
-### `grafana/provisioning/datasources/`
-
-Configura automaticamente o Prometheus como datasource.
-
----
-
-### `grafana/provisioning/dashboards/`
-
-Configura o carregamento automático dos dashboards.
-
----
-
-### `ansible/`
-
-Contém a automação do deploy.
-
----
-
-### `ansible/inventory.ini`
-
-Define as máquinas gerenciadas pelo Ansible.
-
----
-
-### `ansible/playbook.yml`
-
-Contém as tarefas executadas automaticamente durante o deploy.
-
----
-
-## 10. Rede Docker
-
-Os containers precisam conversar entre si.
-
-Para permitir essa comunicação foi utilizada uma rede Docker chamada:
+Foi utilizada:
 
 ```text
 projeto-korp-network
 ```
 
-A rede pode ser criada através de:
+A rede é do tipo:
+
+```text
+bridge
+```
+
+Criação:
 
 ```bash
 docker network create --driver bridge projeto-korp-network
 ```
 
-Para visualizar as redes:
+Verificação:
 
 ```bash
 docker network ls
 ```
 
-A arquitetura pode ser representada assim:
+Inspeção:
+
+```bash
+docker network inspect projeto-korp-network
+```
+
+A arquitetura lógica é:
 
 ```text
-+------------------------------------------------+
-|            projeto-korp-network                |
-|                                                |
-|   +-------------+                              |
-|   | Aplicação Go|                              |
-|   +-------------+                              |
-|          |                                     |
-|   +-------------+                              |
-|   |    Nginx    |                              |
-|   +-------------+                              |
-|                                                |
-|   +-------------+                              |
-|   | Prometheus  |                              |
-|   +-------------+                              |
-|          |                                     |
-|   +-------------+                              |
-|   |   Grafana   |                              |
-|   +-------------+                              |
-|                                                |
-+------------------------------------------------+
++-----------------------------------------+
+|       projeto-korp-network              |
+|                                         |
+|   +------+       +----------+           |
+|   |Nginx | ----> |    Go    |           |
+|   +------+       +----------+           |
+|                       |                 |
+|                       v                 |
+|                 +------------+          |
+|                 | Prometheus |          |
+|                 +------------+          |
+|                       |                 |
+|                       v                 |
+|                   +---------+           |
+|                   | Grafana |           |
+|                   +---------+           |
+|                                         |
++-----------------------------------------+
 ```
 
-No `compose.yaml`, a rede foi configurada como externa:
+No Compose a rede é externa.
 
-```yaml
-networks:
-  projeto-korp-network:
-    external: true
-```
+Isso significa que ela precisa existir antes do Compose utilizá-la.
 
-Por isso ela precisa existir antes da inicialização do Compose.
-
-Caso apareça uma mensagem semelhante a:
+Caso apareça:
 
 ```text
 Network projeto-korp-network declared as external, but could not be found
 ```
 
-a solução é criar a rede:
-
-```bash
-docker network create projeto-korp-network
-```
-
-e executar novamente o deploy.
-
----
-
-## 11. Fluxo Completo de uma Requisição
-
-Quando um usuário acessa:
-
-```text
-http://localhost/projeto-korp
-```
-
-acontece aproximadamente o seguinte:
-
-```text
-1. USUÁRIO
-     |
-     | HTTP
-     v
-
-2. NGINX :80
-     |
-     | proxy reverso
-     v
-
-3. APLICAÇÃO GO :8080
-     |
-     | processa requisição
-     v
-
-4. RESPOSTA
-     |
-     v
-
-5. NGINX
-     |
-     v
-
-6. USUÁRIO
-```
-
-Paralelamente, existe outro fluxo para monitoramento:
-
-```text
-Aplicação Go
-     |
-     | /metrics
-     v
-Prometheus
-     |
-     | consulta métricas
-     v
-Grafana
-     |
-     v
-Dashboard
-```
-
-Portanto, existem dois fluxos principais:
-
-### Fluxo da aplicação
-
-```text
-Usuário -> Nginx -> Go
-```
-
-### Fluxo de observabilidade
-
-```text
-Go -> Prometheus -> Grafana
-```
-
----
-
-## 12. Como Executar o Projeto
-
-### 12.1 Entrar na pasta
-
-```bash
-cd /root/http-server-projeto-korp
-```
-
-Verifique:
-
-```bash
-pwd
-```
-
-Resultado esperado:
-
-```text
-/root/http-server-projeto-korp
-```
-
----
-
-### 12.2 Verificar arquivos
-
-```bash
-ls -la
-```
-
----
-
-### 12.3 Verificar Docker
-
-```bash
-docker --version
-```
-
----
-
-### 12.4 Verificar Docker Compose
-
-```bash
-docker-compose --version
-```
-
----
-
-### 12.5 Criar a rede
-
-Caso ainda não exista:
+execute:
 
 ```bash
 docker network create --driver bridge projeto-korp-network
 ```
 
-Verifique:
+---
 
-```bash
-docker network ls
+# 12. Fluxo Completo da Aplicação
+
+## 12.1 Requisição do usuário
+
+```text
+1. Usuário
+      |
+      | GET /projeto-korp
+      v
+
+2. Nginx
+      |
+      | proxy_pass
+      v
+
+3. Aplicação Go
+      |
+      | processa
+      v
+
+4. Resposta JSON
+      |
+      v
+
+5. Nginx
+      |
+      v
+
+6. Usuário
+```
+
+## 12.2 Monitoramento
+
+Paralelamente:
+
+```text
+Aplicação Go
+      |
+      | métricas
+      v
+Prometheus
+      |
+      | datasource
+      v
+Grafana
+      |
+      v
+Dashboard
+```
+
+## 12.3 Automação
+
+```text
+Ansible
+   |
+   v
+Docker Compose
+   |
+   +-- Go
+   +-- Nginx
+   +-- Prometheus
+   +-- Grafana
 ```
 
 ---
 
-### 12.6 Validar o Compose
+# 13. Execução Manual
+
+## 13.1 Entrar no projeto
+
+```bash
+cd /root/http-server-projeto-korp
+```
+
+ou, após um clone normal:
+
+```bash
+cd http-server-projeto-korp
+```
+
+## 13.2 Verificar diretório
+
+```bash
+pwd
+```
+
+## 13.3 Ver arquivos
+
+```bash
+ls -la
+```
+
+## 13.4 Criar rede
+
+```bash
+docker network create --driver bridge projeto-korp-network
+```
+
+Caso já exista, continue normalmente.
+
+## 13.5 Validar Compose
 
 ```bash
 docker-compose config >/dev/null && echo "COMPOSE OK"
 ```
 
-Resultado esperado:
-
-```text
-COMPOSE OK
-```
-
----
-
-### 12.7 Construir e iniciar
+## 13.6 Iniciar
 
 ```bash
 docker-compose up -d --build
 ```
 
----
-
-### 12.8 Aguardar inicialização
-
-```bash
-sleep 10
-```
-
----
-
-### 12.9 Verificar containers
+## 13.7 Verificar
 
 ```bash
 docker ps
 ```
 
-Devem aparecer os serviços:
+## 13.8 Parar
 
-```text
-http-server-projeto-korp
-nginx-projeto-korp
-prometheus-projeto-korp
-grafana-projeto-korp
+```bash
+docker-compose down
 ```
 
 ---
 
-## 13. Testes Finais
+# 14. Testes e Diagnóstico
 
-Após iniciar a infraestrutura, os componentes podem ser testados individualmente.
-
-### 13.1 Teste da aplicação através do Nginx
+## 14.1 Aplicação
 
 ```bash
 curl -i http://localhost/projeto-korp
 ```
 
-Resultado esperado:
+Esperado:
 
 ```text
 HTTP/1.1 200 OK
 ```
 
-e uma resposta da aplicação semelhante a:
-
-```json
-{"nome":"Projeto Korp","horario":"..."}
-```
-
 ---
 
-### 13.2 Teste do Prometheus
+## 14.2 Prometheus
 
 ```bash
 curl -s http://localhost:9090/-/ready
 ```
 
-Resultado esperado:
+Esperado:
 
 ```text
 Prometheus Server is Ready.
@@ -1190,13 +1537,13 @@ Prometheus Server is Ready.
 
 ---
 
-### 13.3 Teste do Grafana
+## 14.3 Grafana
 
 ```bash
 curl -I http://localhost:3000/login
 ```
 
-Resultado esperado:
+Esperado:
 
 ```text
 HTTP/1.1 200 OK
@@ -1204,63 +1551,95 @@ HTTP/1.1 200 OK
 
 ---
 
-### 13.4 Teste dos containers
+## 14.4 Containers
 
 ```bash
 docker ps
 ```
 
-Todos os serviços devem aparecer com status semelhante a:
-
-```text
-Up
-```
-
 ---
 
-### 13.5 Teste do datasource Grafana
+## 14.5 Todos os containers, inclusive parados
 
 ```bash
-curl -s -u admin:admin http://localhost:3000/api/datasources
-```
-
-Deve existir um datasource chamado:
-
-```text
-Prometheus
+docker ps -a
 ```
 
 ---
 
-### 13.6 Teste do dashboard Grafana
+## 14.6 Logs da aplicação
 
 ```bash
-curl -s -u admin:admin "http://localhost:3000/api/search?query=HTTP"
-```
-
-Deve aparecer:
-
-```text
-HTTP Server Projeto Korp
+docker logs http-server-projeto-korp
 ```
 
 ---
 
-### 13.7 Teste da configuração Docker Compose
+## 14.7 Logs do Nginx
+
+```bash
+docker logs nginx-projeto-korp
+```
+
+---
+
+## 14.8 Logs do Prometheus
+
+```bash
+docker logs prometheus-projeto-korp
+```
+
+---
+
+## 14.9 Logs do Grafana
+
+```bash
+docker logs grafana-projeto-korp
+```
+
+---
+
+## 14.10 Logs em tempo real
+
+Exemplo:
+
+```bash
+docker logs -f http-server-projeto-korp
+```
+
+Para sair:
+
+```text
+Ctrl + C
+```
+
+---
+
+## 14.11 Rede
+
+```bash
+docker network inspect projeto-korp-network
+```
+
+---
+
+## 14.12 Validar dashboard JSON
+
+```bash
+python3 -m json.tool grafana/dashboards/http-server-projeto-korp-dashboard.json > /dev/null && echo "DASHBOARD JSON OK"
+```
+
+---
+
+## 14.13 Validar Compose
 
 ```bash
 docker-compose config >/dev/null && echo "COMPOSE OK"
 ```
 
-Resultado:
-
-```text
-COMPOSE OK
-```
-
 ---
 
-### 13.8 Teste da sintaxe do Ansible
+## 14.14 Validar Ansible
 
 ```bash
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --syntax-check
@@ -1268,13 +1647,13 @@ ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --syntax-check
 
 ---
 
-### 13.9 Teste completo com Ansible
+## 14.15 Executar Ansible
 
 ```bash
 ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
 ```
 
-O resultado final deve apresentar:
+Esperado:
 
 ```text
 failed=0
@@ -1282,172 +1661,77 @@ failed=0
 
 ---
 
-## 14. Deploy Automatizado com Ansible
+# 15. Git e GitHub
 
-O deploy manual seria aproximadamente:
+Git foi utilizado para versionar o desenvolvimento.
 
-```text
-Criar rede
-    |
-    v
-Verificar Compose
-    |
-    v
-Executar build
-    |
-    v
-Subir containers
-    |
-    v
-Verificar containers
-```
+GitHub foi utilizado como repositório remoto.
 
-Com Ansible:
-
-```text
-                  ANSIBLE
-                     |
-                     v
-          +----------------------+
-          | Verifica ambiente    |
-          +----------------------+
-                     |
-                     v
-          +----------------------+
-          | Verifica Docker      |
-          +----------------------+
-                     |
-                     v
-          +----------------------+
-          | Verifica Compose     |
-          +----------------------+
-                     |
-                     v
-          +----------------------+
-          | Valida configuração  |
-          +----------------------+
-                     |
-                     v
-          +----------------------+
-          | Executa deploy       |
-          +----------------------+
-                     |
-                     v
-          +----------------------+
-          | Verifica containers  |
-          +----------------------+
-```
-
-O comando principal é:
-
-```bash
-ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
-```
-
-Isso torna o processo mais padronizado e reduz etapas manuais.
-
----
-
-## 15. Git e GitHub
-
-O **Git** foi utilizado para controlar as versões do projeto.
-
-O **GitHub** foi utilizado como repositório remoto.
-
-### Verificar status
+## 15.1 Verificar status
 
 ```bash
 git status
 ```
 
-Esse comando mostra:
-
-- arquivos modificados;
-- arquivos novos;
-- arquivos preparados para commit;
-- situação da branch.
-
 ---
 
-### Visualizar histórico
+## 15.2 Visualizar últimos commits
 
 ```bash
 git log --oneline -5
 ```
 
-Esse comando mostra os últimos commits de maneira resumida.
-
 ---
 
-### Configuração do usuário Git
-
-Durante o desenvolvimento foi necessário configurar a identidade utilizada nos commits.
+## 15.3 Adicionar arquivos
 
 Exemplo:
 
 ```bash
-git config --global user.email "seu-email@example.com"
-git config --global user.name "Seu Nome"
+git add compose.yaml
 ```
 
----
-
-### Adicionar alterações
-
-Para adicionar arquivos específicos:
-
-```bash
-git add README.md
-```
-
-ou:
+Grafana:
 
 ```bash
 git add compose.yaml grafana
 ```
 
-Para adicionar o Ansible:
+Ansible:
 
 ```bash
 git add ansible
 ```
 
+README:
+
+```bash
+git add README.md
+```
+
 ---
 
-### Commit do Grafana
+## 15.4 Criar commits
 
-Foi utilizado um commit para registrar a implementação do Grafana e do dashboard.
-
-Exemplo:
+Exemplos utilizados durante a evolução do projeto:
 
 ```bash
 git commit -m "feat: adiciona Grafana e dashboard provisionado"
 ```
 
----
-
-### Commit do Ansible
-
-Foi utilizado:
-
 ```bash
 git commit -m "feat: adiciona automacao de deploy com Ansible"
 ```
 
----
-
-### Commit da documentação
-
-Para registrar este README:
+Para a documentação:
 
 ```bash
-git add README.md
-git commit -m "docs: adiciona documentacao completa do projeto"
+git commit -m "docs: adiciona README completo com roteiro de avaliacao tecnica"
 ```
 
 ---
 
-### Enviar para o GitHub
+## 15.5 Enviar para o GitHub
 
 ```bash
 git push origin main
@@ -1455,13 +1739,13 @@ git push origin main
 
 ---
 
-### Verificação final
+## 15.6 Conferência final
 
 ```bash
 git status
 ```
 
-O resultado ideal é:
+Resultado ideal:
 
 ```text
 On branch main
@@ -1470,171 +1754,149 @@ Your branch is up to date with 'origin/main'.
 nothing to commit, working tree clean
 ```
 
-Isso significa que todas as alterações foram registradas e enviadas ao repositório remoto.
+Isso significa que não existem alterações locais pendentes e que a branch está sincronizada com o repositório remoto.
 
 ---
 
-## 16. Conclusão
+# 16. Conclusão
 
-Este projeto demonstra a integração de diferentes tecnologias utilizadas no desenvolvimento de aplicações e em ambientes DevOps.
+O projeto começou com uma aplicação HTTP desenvolvida em Go e foi evoluído para uma arquitetura contendo diferentes componentes de infraestrutura.
 
-A aplicação principal foi desenvolvida utilizando:
+A solução final integra:
 
 ```text
 Go
-```
-
-Ela é executada dentro de um:
-
-```text
-Container Docker
-```
-
-O acesso externo passa pelo:
-
-```text
-Nginx
-```
-
-As métricas são disponibilizadas pela aplicação e coletadas pelo:
-
-```text
-Prometheus
-```
-
-Essas métricas são apresentadas visualmente pelo:
-
-```text
-Grafana
-```
-
-Os serviços são organizados através do:
-
-```text
+ |
+ v
+Docker
+ |
+ v
 Docker Compose
-```
-
-A comunicação ocorre através da:
-
-```text
-projeto-korp-network
-```
-
-O processo de deploy é automatizado através do:
-
-```text
+ |
+ +---------> Nginx
+ |
+ +---------> Prometheus
+ |
+ +---------> Grafana
+ |
+ v
 Ansible
-```
 
-E todas as alterações são controladas através de:
-
-```text
-Git + GitHub
+Versionamento:
+Git -> GitHub
 ```
 
 ### Arquitetura final
 
 ```text
-                         INTERNET / USUÁRIO
-                                |
-                                |
-                                v
-                       +----------------+
-                       |     NGINX      |
-                       |    Porta 80    |
-                       | Proxy Reverso  |
-                       +----------------+
-                                |
-                                |
-                                v
-                       +----------------+
-                       |  APLICAÇÃO GO  |
-                       |   Porta 8080   |
-                       | Servidor HTTP  |
-                       +----------------+
-                                |
-                                |
-                         expõe métricas
-                                |
-                                v
-                       +----------------+
-                       |   PROMETHEUS   |
-                       |   Porta 9090   |
-                       | Coleta métricas|
-                       +----------------+
-                                |
-                                |
-                                v
-                       +----------------+
-                       |    GRAFANA     |
-                       |   Porta 3000   |
-                       |   Dashboard    |
-                       +----------------+
+                         USUÁRIO
+                            |
+                            v
+                  +-------------------+
+                  |       NGINX       |
+                  |      Porta 80     |
+                  |   Proxy Reverso   |
+                  +-------------------+
+                            |
+                            v
+                  +-------------------+
+                  |    APLICAÇÃO GO   |
+                  |     Porta 8080    |
+                  |    Servidor HTTP  |
+                  +-------------------+
+                            |
+                            | métricas
+                            v
+                  +-------------------+
+                  |    PROMETHEUS     |
+                  |     Porta 9090    |
+                  | Coleta de métricas|
+                  +-------------------+
+                            |
+                            v
+                  +-------------------+
+                  |      GRAFANA      |
+                  |     Porta 3000    |
+                  |     Dashboard     |
+                  +-------------------+
 
 
-                +--------------------------------+
-                |          DOCKER                |
-                |                                |
-                | Executa todos os containers    |
-                +--------------------------------+
-                               |
-                               v
-                +--------------------------------+
-                |       DOCKER COMPOSE           |
-                |                                |
-                | Organiza serviços, volumes,    |
-                | portas, dependências e rede    |
-                +--------------------------------+
+             +--------------------------------+
+             |             DOCKER             |
+             |                                |
+             | Executa serviços em containers |
+             +--------------------------------+
+                            |
+                            v
+             +--------------------------------+
+             |        DOCKER COMPOSE          |
+             |                                |
+             | Organiza containers, rede,     |
+             | portas, volumes e dependências |
+             +--------------------------------+
+                            ^
+                            |
+             +--------------------------------+
+             |            ANSIBLE             |
+             |                                |
+             | Automatiza tarefas de deploy   |
+             +--------------------------------+
 
 
-                +--------------------------------+
-                |            ANSIBLE             |
-                |                                |
-                | Automatiza o processo de       |
-                | verificação e deploy           |
-                +--------------------------------+
-
-
-                +--------------------------------+
-                |        GIT + GITHUB            |
-                |                                |
-                | Versionamento e armazenamento  |
-                | do código-fonte                |
-                +--------------------------------+
+             +--------------------------------+
+             |         GIT + GITHUB           |
+             |                                |
+             | Versionamento e repositório    |
+             +--------------------------------+
 ```
 
-### Resumo final das tecnologias
+### Responsabilidade de cada tecnologia
 
-| Tecnologia | Responsabilidade | Explicação para iniciantes |
+| Tecnologia | Responsabilidade | Explicação simples |
 |---|---|---|
-| **Go** | Aplicação | Executa a lógica do servidor |
-| **Docker** | Containerização | Cria ambientes isolados |
-| **Dockerfile** | Construção da imagem | Define como preparar a aplicação |
-| **Docker Compose** | Organização | Gerencia vários containers |
-| **Nginx** | Proxy reverso | Funciona como porta de entrada |
-| **Prometheus** | Métricas | Coleta informações da aplicação |
-| **Grafana** | Dashboard | Exibe as métricas visualmente |
-| **Ansible** | Automação | Automatiza o deploy |
-| **Git** | Versionamento | Mantém histórico das alterações |
+| **Go** | Backend | Executa a aplicação HTTP |
+| **Docker** | Containerização | Isola os serviços |
+| **Dockerfile** | Build | Define como a imagem Go é construída |
+| **Docker Compose** | Orquestração local | Gerencia os containers |
+| **Nginx** | Proxy reverso | Recebe o acesso externo |
+| **Prometheus** | Monitoramento | Coleta métricas |
+| **Grafana** | Observabilidade | Exibe métricas em dashboards |
+| **Ansible** | Automação | Automatiza tarefas de deploy |
+| **Git** | Versionamento | Registra alterações |
 | **GitHub** | Repositório remoto | Armazena e compartilha o projeto |
 
-### Resultado
+### Resultado final
 
-Ao final do desafio foi obtida uma arquitetura que reúne:
+Ao final do desenvolvimento foram implementados:
 
-- aplicação HTTP desenvolvida em Go;
-- imagem Docker com processo de build;
-- múltiplos containers;
-- proxy reverso;
-- rede Docker;
+- servidor HTTP em Go;
+- resposta JSON;
+- Dockerfile;
+- multi-stage build;
+- containerização da aplicação;
+- Nginx como proxy reverso;
 - Docker Compose;
-- coleta de métricas;
+- rede Docker;
 - Prometheus;
-- dashboard Grafana;
-- provisionamento automático;
-- automação com Ansible;
+- métricas da aplicação;
+- Grafana;
+- datasource provisionado;
+- dashboard provisionado;
+- Ansible;
+- automação do deploy;
+- validação do playbook;
 - testes dos serviços;
-- controle de versão;
-- publicação no GitHub.
+- Git;
+- GitHub;
+- documentação;
+- roteiro de avaliação técnica.
 
-Dessa forma, o projeto não representa apenas um servidor HTTP simples, mas uma pequena infraestrutura completa contendo conceitos de **desenvolvimento backend, containerização, redes, proxy reverso, observabilidade, monitoramento, infraestrutura como código, automação de deploy e versionamento**.
+Dessa forma, o projeto demonstra de maneira prática conceitos relacionados a:
+
+**Backend + Containers + Redes + Proxy Reverso + Monitoramento + Observabilidade + Automação + Infraestrutura como Código + Versionamento.**
+
+---
+
+## Autor
+
+Projeto desenvolvido como parte de um desafio técnico para demonstração prática de conhecimentos em desenvolvimento, containers, infraestrutura, observabilidade e automação.
